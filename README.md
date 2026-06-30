@@ -111,7 +111,7 @@ society-maintenance-tracker/
 ### 1. Clone and install
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/ankit-prabhavak/society-maintenance-tracker.git
 cd society-maintenance-tracker
 
 # Backend
