@@ -1,61 +1,70 @@
-# 🏢 Society Maintenance Tracker
+# Society Maintenance Tracker
 
-A full-stack web application for apartment societies to manage maintenance complaints end-to-end — residents raise and track issues with photos, admins triage and resolve them through a clear status workflow, and everyone stays informed via a notice board and automated email updates.
+A full-stack web application for apartment societies to manage maintenance complaints end-to-end. Residents can raise and track issues with photos, admins triage and resolve them through a clear status workflow, and everyone stays informed via a central notice board and automated email updates.
 
-**Stack:** React · Node.js · Express · MongoDB · JWT Auth · Multer · Nodemailer
-
----
-
-## Table of Contents
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Setup Guide](#setup-guide)
-- [Environment Variables](#environment-variables)
-- [Database Schema](#database-schema)
-- [API Documentation](#api-documentation)
-- [Deployment](#deployment)
-- [Docker](#docker)
+> **Hosting Notice:** This application is hosted on the Render free tier. The backend server automatically spins down after periods of inactivity. It may take **50 to 60 seconds** for the initial load/authentication request to process while the server wakes up.
 
 ---
 
-## Features
+## Demo Accounts for Review
 
-**Residents**
-- Register/login with JWT-based auth
-- Raise complaints with category, description, and an optional photo
-- View all their complaints with full status history (timestamp, actor, note for every change)
-- Browse the notice board (important notices pinned to top)
-- Receive email notifications when complaint status changes or an important notice is posted
+Use the credentials below to test the active roles in the application, or register a new resident account directly on the signup page.
 
-**Admins**
-- View all complaints; filter by category, status, priority, date range, or free-text search
-- Set/change priority (Low / Medium / High) on any open complaint
-- Update status (Open → In Progress → Resolved); every change is recorded with timestamp + optional note
-- Resolved complaints are locked from further edits
-- Overdue complaints (open beyond a configurable threshold) are automatically flagged and surfaced at the top
-- Post notices to the board, optionally marked important (pins + emails all residents)
-- Dashboard: totals by status, by category, by priority, and overdue count
+### Admin Dashboard Access
+
+* **Email:** `tvf@gmail.com`
+* **Password:** `ankit1718`
+
+### Resident Portal Access
+
+* **Email:** `ankitabcd1718@gmail.com`
+* **Password:** `ankit1718` *(or register a fresh account via the UI)*
 
 ---
 
 ## Tech Stack
 
-| Layer        | Technology                                  |
-|--------------|----------------------------------------------|
-| Frontend     | React 18, React Router v6, plain CSS         |
-| Backend      | Node.js, Express                             |
-| Database     | MongoDB (Mongoose ODM)                       |
-| Auth         | JWT + bcryptjs                               |
-| File Upload  | Multer (disk storage)                        |
-| Email        | Nodemailer (SMTP, e.g. Gmail free tier)      |
-| Deployment   | Render.com / Docker                          |
+```
+React · Node.js · Express · MongoDB · JWT Auth · Multer · Nodemailer
+
+```
+
+| Layer | Technology |
+| --- | --- |
+| **Frontend** | React 18, React Router v6, plain CSS |
+| **Backend** | Node.js, Express |
+| **Database** | MongoDB (Mongoose ODM) |
+| **Auth** | JWT + bcryptjs |
+| **File Upload** | Multer (disk storage) |
+| **Email** | Nodemailer (SMTP, e.g., Gmail free tier) |
+| **Deployment** | Render.com / Docker |
+
+---
+
+## Features
+
+### Residents
+
+* **Secure Auth:** Register and log in with JWT-based authentication.
+* **Raise Complaints:** Submit issues complete with category selection, deep descriptions, and an optional photo upload.
+* **Audit History:** View all personal complaints along with a chronological history timeline showing timestamps, acting users, and notes for every single state update.
+* **Notice Board:** Browse real-time updates and community guidelines, with critical updates pinned securely to the top.
+* **Instant Notifications:** Receive automated emails whenever a complaint status changes or an important announcement goes live.
+
+### Admins
+
+* **Advanced Triage:** Monitor all global community complaints. Filter down records by category, status, priority levels, custom date ranges, or global free-text search.
+* **Priority & Workflow Management:** Manually adjust priority levels (`Low` / `Medium` / `High`) and transition tickets through states (`Open` → `In Progress` → `Resolved`).
+* **Immutable Resolution:** Resolved issues are locked from further manual changes to protect history records.
+* **SLA & Overdue Alerting:** Tickets open beyond a customizable day threshold are dynamically flagged as overdue and automatically bubbled up to the top of the feed.
+* **Bulletins:** Broadcast community notices, with optional "Important" flags to pin messages and blast them to all resident email addresses.
+* **Metrics Dashboard:** High-level operational view displaying totals broken down by current status, issue categories, priority bands, and active overdue counters.
 
 ---
 
 ## Project Structure
 
-```
+```text
 society-maintenance-tracker/
 ├── backend/
 │   ├── config/
@@ -76,7 +85,7 @@ society-maintenance-tracker/
 │   ├── utils/
 │   │   ├── email.js         # Nodemailer templates
 │   │   └── overdue.js       # Overdue detection logic
-│   ├── uploads/              # Uploaded complaint photos
+│   ├── uploads/             # Uploaded complaint photos
 │   ├── server.js
 │   ├── package.json
 │   ├── Dockerfile
@@ -97,6 +106,7 @@ society-maintenance-tracker/
 ├── docker-compose.yml
 ├── .github/workflows/ci.yml
 └── README.md
+
 ```
 
 ---
@@ -104,180 +114,170 @@ society-maintenance-tracker/
 ## Setup Guide
 
 ### Prerequisites
-- Node.js 18+
-- A MongoDB instance (local or [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) free tier)
-- A Gmail account (or any SMTP provider) for email notifications — optional but recommended
 
-### 1. Clone and install
+* Node.js 18+
+* A running MongoDB instance (local or a cloud-hosted MongoDB Atlas cluster)
+* An SMTP Mail server configuration (like a Gmail account utilizing App Passwords)
+
+### 1. Clone & Install Dependencies
 
 ```bash
 git clone https://github.com/ankit-prabhavak/society-maintenance-tracker.git
 cd society-maintenance-tracker
 
-# Backend
+# Setup Backend Environment
 cd backend
 npm install
-cp .env.example .env   # fill in your values, see below
+cp .env.example .env
 
-# Frontend
+# Setup Frontend Environment
 cd ../frontend
 npm install
 cp .env.example .env
+
 ```
 
-### 2. Configure environment variables
+### 2. Configure Environment Variables
 
-See [Environment Variables](#environment-variables) below for what each one means.
+Open your newly created `.env` files and map the keys as detailed in the Environment Variables reference block below.
 
-### 3. Run locally
+### 3. Run the Development Environment
 
 ```bash
-# Terminal 1 — backend
+# Terminal 1: Spin up the API server
 cd backend
-npm run dev          # nodemon, runs on http://localhost:5000
+npm run dev          # Nodemon watcher -> target: http://localhost:5000
 
-# Terminal 2 — frontend
+# Terminal 2: Spin up the UI client
 cd frontend
-npm start             # runs on http://localhost:3000
+npm start            # Dev server -> target: http://localhost:3000
+
 ```
 
-### 4. Log in as admin
+### 4. Admin Seeding Account
 
-A default admin account is seeded automatically on the first server start 
-using the ADMIN_EMAIL, ADMIN_PASSWORD, and ADMIN_NAME values from your .env. 
-Use those credentials to log in at /login — no manual database editing needed.
+A baseline system administrator account is seeded natively into your database on the very first execution boot of the backend runtime. It reads directly from the `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and `ADMIN_NAME` keys passed inside `backend/.env`. Use these values to log in directly via `/login`.
 
-### 5. Windows-specific note
+### 5. Windows Operating System Warning
 
-If you're on Windows with Node.js 18+, no special flags are needed for this project. If you hit MongoDB Atlas TLS errors on Node 22, add `--openssl-legacy-provider` to the `start` script in `backend/package.json` (this was needed in a prior project, kept here for reference).
+If running locally on a Windows platform using Node 18+, configurations execute natively. If you experience TLS handshaking issues connecting out to MongoDB Atlas on Node 22+, append `--openssl-legacy-provider` into the `start` task definition block inside your `backend/package.json` manifest.
 
 ---
 
 ## Environment Variables
 
-### Backend (`backend/.env`)
+### Backend Configuration (`backend/.env`)
 
-| Variable          | Description                                              | Example                                  |
-|-------------------|------------------------------------------------------------|-------------------------------------------|
-| `PORT`            | Port the API server listens on                            | `5000`                                     |
-| `MONGODB_URI`     | MongoDB connection string                                  | `mongodb+srv://user:pass@cluster.mongodb.net/society-maintenance` |
-| `JWT_SECRET`      | Secret used to sign JWT tokens                              | any long random string                     |
-| `FRONTEND_URL`    | Used for CORS                                              | `http://localhost:3000`                    |
-| `EMAIL_HOST`      | SMTP host                                                  | `smtp.gmail.com`                           |
-| `EMAIL_PORT`      | SMTP port                                                  | `587`                                      |
-| `EMAIL_USER`      | SMTP username / sender email                                | `you@gmail.com`                            |
-| `EMAIL_PASS`      | SMTP password (use a [Gmail App Password](https://myaccount.google.com/apppasswords), not your real password) | `xxxx xxxx xxxx xxxx` |
-| `SOCIETY_NAME`    | Display name used in email templates                       | `Greenwood Residency`                      |
+| Key Name | Purpose / Responsibility | Reference Example |
+| --- | --- | --- |
+| `PORT` | Target port address for API routing infrastructure. | `5000` |
+| `MONGODB_URI` | Dynamic cluster authentication string connection pool. | `mongodb+srv://user:pass@cluster.mongodb.net/db` |
+| `JWT_SECRET` | Salt key utilized to cryptographic sign authorization tokens. | `your_long_random_secure_string_here` |
+| `FRONTEND_URL` | Explicit address string required for CORS middleware validation. | `http://localhost:3000` |
+| `EMAIL_HOST` | Outbound mailing provider SMTP engine endpoint. | `smtp.gmail.com` |
+| `EMAIL_PORT` | Port binding assignment for security mail relays. | `587` |
+| `EMAIL_USER` | Authenticating dispatch email account address. | `you@gmail.com` |
+| `EMAIL_PASS` | Target credential token (Use a Google App Password). | `xxxx xxxx xxxx xxxx` |
+| `SOCIETY_NAME` | Template keyword injected into system mail configurations. | `Greenwood Residency` |
 
-> Email is optional — if `EMAIL_USER` is not set, the app skips sending emails silently rather than failing requests.
+> Note: If `EMAIL_USER` remains unmapped, processing flows gracefully jump over outbound email dispatches silently instead of throwing breaking runtime exceptions.
 
-### Frontend (`frontend/.env`)
+### Frontend Configuration (`frontend/.env`)
 
-| Variable              | Description                       | Example                          |
-|-----------------------|------------------------------------|-----------------------------------|
-| `REACT_APP_API_URL`   | Base URL of the backend API        | `http://localhost:5000/api`       |
+| Key Name | Purpose / Responsibility | Reference Example |
+| --- | --- | --- |
+| `REACT_APP_API_URL` | Target base address pointing out to API routing layers. | `http://localhost:5000/api` |
 
 ---
 
 ## Database Schema
 
 ### `users`
-| Field             | Type     | Notes                                  |
-|-------------------|----------|------------------------------------------|
-| `name`            | String   | required                                |
-| `email`           | String   | required, unique, lowercase             |
-| `password`        | String   | bcrypt-hashed, never returned in JSON   |
-| `role`            | Enum     | `resident` \| `admin`, default `resident` |
-| `apartmentNumber` | String   | optional                                |
-| `phone`           | String   | optional                                |
-| `createdAt/updatedAt` | Date | auto (timestamps)                       |
+
+| Property | DataType | Structural Flags / Restrictions |
+| --- | --- | --- |
+| `name` | String | Required |
+| `email` | String | Required, Unique, Lowercase |
+| `password` | String | Bcrypt-hashed, protected from API JSON responses |
+| `role` | Enum | `resident` | `admin` (Defaults to `resident`) |
+| `apartmentNumber` | String | Optional |
+| `phone` | String | Optional |
+| `timestamps` | Date | Managed automatically via Mongoose engine layer |
 
 ### `complaints`
-| Field             | Type            | Notes                                          |
-|-------------------|-----------------|--------------------------------------------------|
-| `title`           | String          | required                                        |
-| `description`     | String          | required                                        |
-| `category`        | Enum            | Plumbing / Electrical / Elevator / Security / Cleaning / Parking / Noise / Internet / Other |
-| `status`          | Enum            | Open / In Progress / Resolved, default `Open`   |
-| `priority`        | Enum            | Low / Medium / High, default `Medium`           |
-| `photo`           | String          | filename stored in `/uploads`, optional         |
-| `resident`        | ObjectId → User | who raised it                                   |
-| `statusHistory`   | Array           | see below — every status change is appended     |
-| `isOverdue`       | Boolean         | computed on read, see overdue detection         |
-| `resolvedAt`      | Date            | set when status becomes Resolved                |
-| `createdAt/updatedAt` | Date        | auto (timestamps)                               |
 
-**`statusHistory` subdocument:**
-| Field        | Type            | Notes                          |
-|--------------|-----------------|----------------------------------|
-| `status`     | Enum            | Open / In Progress / Resolved   |
-| `changedBy`  | ObjectId → User | who made the change              |
-| `note`       | String          | optional admin note              |
-| `timestamp`  | Date            | auto, defaults to now             |
+| Property | DataType | Structural Flags / Restrictions |
+| --- | --- | --- |
+| `title` | String | Required |
+| `description` | String | Required |
+| `category` | Enum | Plumbing / Electrical / Elevator / Security / Cleaning / Parking / Noise / Internet / Other |
+| `status` | Enum | `Open` | `In Progress` | `Resolved` (Defaults to `Open`) |
+| `priority` | Enum | `Low` | `Medium` | `High` (Defaults to `Medium`) |
+| `photo` | String | Mapped target filename resolving to `/uploads` directory |
+| `resident` | ObjectId | Relational mapping link pointing to a `User` model |
+| `statusHistory` | Array | Chronological subdocument tracking trail (Schema outlined below) |
+| `isOverdue` | Boolean | Read-time calculated flag determined via engine settings |
+| `resolvedAt` | Date | Automatically logged when a ticket transitions to `Resolved` |
 
-A complaint always has at least one history entry (`Open`, "Complaint raised") created at submission time, so the full lifecycle is always reconstructable without a separate audit table.
+#### `statusHistory` Subdocument Format
 
-### `notices`
-| Field         | Type            | Notes                |
-|---------------|-----------------|-------------------------|
-| `title`       | String          | required               |
-| `content`     | String          | required               |
-| `isImportant` | Boolean         | default `false`, pins to top + triggers email |
-| `postedBy`    | ObjectId → User | admin who posted it     |
-| `createdAt/updatedAt` | Date    | auto (timestamps)       |
-
-### `settings`
-| Field   | Type    | Notes                                                   |
-|---------|---------|------------------------------------------------------------|
-| `key`   | String  | unique, e.g. `overdueThresholdDays`                        |
-| `value` | Mixed   | currently a Number (days) — generic key/value for future config |
+* `status`: Enum (`Open` | `In Progress` | `Resolved`)
+* `changedBy`: ObjectId referencing the `User` who modified the state
+* `note`: Optional administrative text explanation
+* `timestamp`: Date logging field defaulting to system runtime execution time
 
 ---
 
 ## API Documentation
 
-Base URL: `http://localhost:5000/api`
+**Base Gateway Path:** `http://localhost:5000/api`
 
-All endpoints except `/auth/register` and `/auth/login` require a header:
-```
+Authenticated router contexts require a valid bearer authorization element added into your header schemas:
+
+```http
 Authorization: Bearer <jwt_token>
+
 ```
 
-### Auth
+### Authentication Services
 
-| Method | Endpoint            | Access | Description                          |
-|--------|----------------------|--------|----------------------------------------|
-| POST   | `/auth/register`    | Public | Register a resident. Body: `{ name, email, password, apartmentNumber?, phone? }` |
-| POST   | `/auth/login`       | Public | Login. Body: `{ email, password }`. Returns `{ token, user }` |
-| GET    | `/auth/me`           | Auth   | Get the logged-in user's profile      |
+| Method | Route Path | Context | Intended payload behavior |
+| --- | --- | --- | --- |
+| **POST** | `/auth/register` | Public | Register new resident accounts. |
+| **POST** | `/auth/login` | Public | Process credentials. Returns `{ token, user }`. |
+| **GET** | `/auth/me` | Auth | Pull structural profile configurations for current user. |
 
-### Complaints
+### Complaint Lifecycles
 
-| Method | Endpoint                                  | Access  | Description |
-|--------|---------------------------------------------|---------|--------------|
-| POST   | `/complaints`                              | Resident | Create a complaint. `multipart/form-data` with `title, description, category, photo?` |
-| GET    | `/complaints/my`                           | Resident | Get the logged-in resident's complaints |
-| GET    | `/complaints`                              | Admin   | Get all complaints. Query params: `category, status, priority, startDate, endDate, search` |
-| GET    | `/complaints/:id`                          | Auth    | Get a single complaint (residents can only view their own) |
-| PATCH  | `/complaints/:id`                          | Admin   | Update status/priority. Body: `{ status?, priority?, note? }`. Resolved complaints reject further updates. |
-| GET    | `/complaints/settings/overdue-threshold`   | Admin   | Get current overdue threshold (days) |
-| PUT    | `/complaints/settings/overdue-threshold`   | Admin   | Set overdue threshold. Body: `{ days }` |
+| Method | Route Path | Context | Intended payload behavior |
+| --- | --- | --- | --- |
+| **POST** | `/complaints` | Resident | File a ticket via `multipart/form-data`. |
+| **GET** | `/complaints/my` | Resident | Pull history tickets belonging to current resident context. |
+| **GET** | `/complaints` | Admin | Filter global tickets by status, category, date, or query string. |
+| **GET** | `/complaints/:id` | Auth | Pull details for a specific ticket. |
+| **PATCH** | `/complaints/:id` | Admin | Modify state/priority. Resolved records block modifications. |
+| **GET** | `/complaints/settings/overdue-threshold` | Admin | View current tracking configuration settings (in days). |
+| **PUT** | `/complaints/settings/overdue-threshold` | Admin | Mutate tracking thresholds via `{ days }` payloads. |
 
-### Notices
+### Notice System
 
-| Method | Endpoint          | Access  | Description |
-|--------|---------------------|---------|--------------|
-| GET    | `/notices`         | Auth    | Get all notices (important ones first) |
-| POST   | `/notices`          | Admin   | Post a notice. Body: `{ title, content, isImportant? }`. Important notices email all residents. |
-| DELETE | `/notices/:id`      | Admin   | Delete a notice |
+| Method | Route Path | Context | Intended payload behavior |
+| --- | --- | --- | --- |
+| **GET** | `/notices` | Auth | Pull bulletin records, pinning important metrics first. |
+| **POST** | `/notices` | Admin | Publish notice announcements. Important updates fire system emails. |
+| **DELETE** | `/notices/:id` | Admin | Purge old announcement items out of live database clusters. |
 
-### Dashboard
+### Operational Insights
 
-| Method | Endpoint       | Access | Description |
-|--------|------------------|--------|--------------|
-| GET    | `/dashboard`     | Admin  | Returns `{ total, byStatus, byCategory, byPriority, overdueCount, recentComplaints }` |
+| Method | Route Path | Context | Intended payload behavior |
+| --- | --- | --- | --- |
+| **GET** | `/dashboard` | Admin | Pull structural layout analytical datasets for core metrics charts. |
 
-### Example: Create a complaint
+---
+
+### Request Execution Blueprints
+
+#### Creating a Complaint
 
 ```bash
 curl -X POST http://localhost:5000/api/complaints \
@@ -286,60 +286,59 @@ curl -X POST http://localhost:5000/api/complaints \
   -F "category=Plumbing" \
   -F "description=Water has been leaking under the sink since this morning" \
   -F "photo=@/path/to/photo.jpg"
+
 ```
 
-### Example: Update complaint status
+#### Modifying Status
 
 ```bash
 curl -X PATCH http://localhost:5000/api/complaints/<id> \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{"status": "In Progress", "note": "Plumber scheduled for tomorrow 10am"}'
+
 ```
 
 ---
 
-## Deployment
+## Deployment Instructions
 
-### Render.com (recommended, matches free-tier setup used previously)
+### Render.com Setup
 
-**Backend (Web Service)**
-1. New → Web Service → connect repo → root directory `backend`
-2. Build command: `npm install`
-3. Start command: `npm start`
-4. Add all backend env vars from `.env.example` in the Render dashboard
-5. Set `MONGODB_URI` to your MongoDB Atlas connection string (whitelist `0.0.0.0/0` or Render's IPs in Atlas Network Access)
+#### Web Service Configuration (Backend API)
 
-**Frontend (Static Site)**
-1. New → Static Site → connect repo → root directory `frontend`
-2. Build command: `npm install && npm run build`
-3. Publish directory: `build`
-4. Add `REACT_APP_API_URL` pointing to your deployed backend URL + `/api`
-5. Update the backend's `FRONTEND_URL` env var to your deployed frontend URL (for CORS)
+1. Select **New Web Service** and bind your source code repository.
+2. Define your root compilation target folder pathing as `backend`.
+3. Map the runtime installation execution build commands to use `npm install`.
+4. Configure your application startup run sequence script array to use `npm start`.
+5. Populate the active operational keys matching the definitions inside `.env.example`.
+6. Open outbound MongoDB Atlas connection strings to resolve globally (`0.0.0.0/0`).
 
-### MongoDB Atlas
-1. Create a free M0 cluster
-2. Create a database user
-3. Network Access → allow access from anywhere (`0.0.0.0/0`) for Render compatibility
-4. Copy the connection string into `MONGODB_URI`
+#### Static Site Configuration (Frontend Client)
+
+1. Select **New Static Site** and map out your repository target paths.
+2. Define your compilation target root workspace route configuration folder as `frontend`.
+3. Set your operational distribution asset build commands to run `npm install && npm run build`.
+4. Bind your operational production deployment directory targets pointing strictly at `build`.
+5. Point the environmental variables asset key `REACT_APP_API_URL` to point to your live backend domain gateway string followed by the trailing path `/api`.
 
 ---
 
-## Docker
+## Containerization (Docker)
 
-A `docker-compose.yml` is provided for local containerized development:
+To quickly initialize localized development runtime instances inside standardized container networks, spin up the configured compose infrastructure layout:
 
 ```bash
-# Ensure backend/.env is filled in first
+# Populate backend/.env parameters prior to orchestration
 docker compose up --build
-```
-- Backend: `http://localhost:5000`
-- Frontend: `http://localhost:3000`
 
-Each service also has a standalone `Dockerfile` for independent container deployment (e.g. Render's Docker runtime, Railway, etc).
+```
+
+* **Backend Server Gateway:** Available via browser targets at `http://localhost:5000`
+* **Frontend Client Gateway:** Available via browser targets at `http://localhost:3000`
 
 ---
 
-## CI/CD
+## CI/CD Verification Track
 
-`.github/workflows/ci.yml` runs on every push/PR to `main`: installs dependencies and verifies both the backend syntax and the frontend production build succeed.
+System testing routines map out dynamically via automated code pipeline parameters written within `.github/workflows/ci.yml`. Commits target branches running merge workflows against `main` automatically pull base dependencies, check architectural syntax structural layers for code validation, and verify stable frontend production asset build states compile without operational warnings.
