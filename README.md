@@ -25,7 +25,7 @@ Use the credentials below to test the active roles in the application, or regist
 ## Tech Stack
 
 ```
-React · Node.js · Express · MongoDB · JWT Auth · Multer · Nodemailer
+React · Node.js · Express · MongoDB · JWT Auth · Cloudinary · Nodemailer
 
 ```
 
@@ -35,7 +35,7 @@ React · Node.js · Express · MongoDB · JWT Auth · Multer · Nodemailer
 | **Backend** | Node.js, Express |
 | **Database** | MongoDB (Mongoose ODM) |
 | **Auth** | JWT + bcryptjs |
-| **File Upload** | Multer (disk storage) |
+| **File Upload** | Cloudinary |
 | **Email** | Nodemailer (SMTP, e.g., Gmail free tier) |
 | **Deployment** | Render.com / Docker |
 
