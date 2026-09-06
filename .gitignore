@@ -9,3 +9,5 @@ out/
 .DS_Store
 backend/uploads/*
 !backend/uploads/.gitkeep
+
+iam-policy.json

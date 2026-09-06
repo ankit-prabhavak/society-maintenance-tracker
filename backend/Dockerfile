@@ -7,8 +7,6 @@ RUN npm install --production
 
 COPY . .
 
-RUN mkdir -p uploads
-
 EXPOSE 5000
 
 CMD ["node", "server.js"]
