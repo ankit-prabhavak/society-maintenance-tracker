@@ -1,0 +1,51 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pr:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: Validate
+    displayName: Validate Application
+
+    jobs:
+      - job: Backend
+        displayName: Backend Validation
+
+        steps:
+          - checkout: self
+
+          - task: NodeTool@0
+            displayName: Setup Node.js
+            inputs:
+              versionSpec: '18.x'
+
+          - script: |
+              cd backend
+              npm ci
+              node -c server.js
+            displayName: Install and check backend
+
+      - job: Frontend
+        displayName: Frontend Validation
+
+        steps:
+          - checkout: self
+
+          - task: NodeTool@0
+            displayName: Setup Node.js
+            inputs:
+              versionSpec: '18.x'
+
+          - script: |
+              cd frontend
+              npm ci
+              CI=true npm run build
+            displayName: Install and build frontend
