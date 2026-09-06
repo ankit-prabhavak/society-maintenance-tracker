@@ -49,3 +49,23 @@ stages:
               npm ci
               CI=true npm run build
             displayName: Install and build frontend
+
+  - stage: Docker
+    displayName: Build Docker Images
+
+    jobs:
+      - job: BuildImages
+        displayName: Build Backend and Frontend Images
+
+        steps:
+          - checkout: self
+
+          - script: |
+              docker build -t society-maintenance-backend:$(Build.SourceVersion) ./backend
+              docker build -t society-maintenance-frontend:$(Build.SourceVersion) ./frontend
+            displayName: Build Docker images
+
+          - script: |
+              docker images society-maintenance-backend
+              docker images society-maintenance-frontend
+            displayName: Verify Docker images
