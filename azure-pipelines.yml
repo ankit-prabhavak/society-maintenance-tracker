@@ -72,63 +72,40 @@ stages:
     dependsOn: Validate
 
     jobs:
-
       - job: BuildAndPush
         displayName: Build and Push to Amazon ECR
 
         steps:
           - checkout: self
 
-          # -----------------------------
-          # Build Docker images
-          # -----------------------------
-
           - script: |
-              docker build \
-                -t society-maintenance-backend:$(IMAGE_TAG) \
-                ./backend
-
-              docker build \
-                -t society-maintenance-frontend:$(IMAGE_TAG) \
-                ./frontend
+              docker build -t society-maintenance-backend:$(IMAGE_TAG) ./backend
+              docker build -t society-maintenance-frontend:$(IMAGE_TAG) ./frontend
             displayName: Build Docker images
 
-
-          # -----------------------------
-          # Verify Docker images
-          # -----------------------------
-
-          - script: |
-              docker images society-maintenance-backend
-              docker images society-maintenance-frontend
-            displayName: Verify Docker images
-
-
-          # -----------------------------
-          # Push Backend → ECR
-          # -----------------------------
-
-          - task: AWSECRPushImage@1
-            displayName: Push Backend Image to ECR
+          - task: AWSShellScript@1
+            displayName: Login and Push Images to ECR
             inputs:
               awsCredentials: 'AWS-ECR'
               regionName: '$(AWS_REGION)'
-              sourceImageName: 'society-maintenance-backend'
-              sourceImageTag: '$(IMAGE_TAG)'
-              repositoryName: 'society-maintenance-backend'
-              pushTag: '$(IMAGE_TAG)'
+              scriptType: 'inline'
+              inlineScript: |
+                ACCOUNT_ID=625552167867
+                REGION=$(AWS_REGION)
 
+                ECR_REGISTRY=$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com
 
-          # -----------------------------
-          # Push Frontend → ECR
-          # -----------------------------
+                aws ecr get-login-password --region $REGION | \
+                  docker login --username AWS --password-stdin $ECR_REGISTRY
 
-          - task: AWSECRPushImage@1
-            displayName: Push Frontend Image to ECR
-            inputs:
-              awsCredentials: 'AWS-ECR'
-              regionName: '$(AWS_REGION)'
-              sourceImageName: 'society-maintenance-frontend'
-              sourceImageTag: '$(IMAGE_TAG)'
-              repositoryName: 'society-maintenance-frontend'
-              pushTag: '$(IMAGE_TAG)'
+                docker tag society-maintenance-backend:$(IMAGE_TAG) \
+                  $ECR_REGISTRY/society-maintenance-backend:$(IMAGE_TAG)
+
+                docker tag society-maintenance-frontend:$(IMAGE_TAG) \
+                  $ECR_REGISTRY/society-maintenance-frontend:$(IMAGE_TAG)
+
+                docker push \
+                  $ECR_REGISTRY/society-maintenance-backend:$(IMAGE_TAG)
+
+                docker push \
+                  $ECR_REGISTRY/society-maintenance-frontend:$(IMAGE_TAG)
